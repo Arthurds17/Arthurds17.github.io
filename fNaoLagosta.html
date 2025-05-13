@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>QuizLagosta</title>
+        <link rel="stylesheet" href="Final.css">
+        <script>
+            window.onload = function () {
+                const audio = document.getElementById("audioTriste");
+                audio.play().catch(() => {
+                    document.body.addEventListener('click', () => {
+                        audio.play();
+                    }, { once: true });
+                });
+            }
+        </script>
+    </head>
+
+    <body>
+            <h1>INFELIZMENTE VOCÊ NÃO É UMA LAGOSTA!<br><div class="choro">T-T</div></h1>
+            <h2>
+                <img src="imagens/homemchorando.webp" alt="Imagem de homem chorando"><br>
+               ;-; | O resultado que tivemos é que você NÃO é uma lagosta | ;-;<br>
+            </h2>
+            <button><a href="site.html">Tentar de Novo</a></button>
+            <audio id="audioTriste" src="sons/Triste.mp3"></audio>
+    </body>
+</html>

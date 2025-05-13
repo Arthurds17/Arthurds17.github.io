@@ -1,0 +1,53 @@
+body{
+    background-color: lightgray;
+}
+#ttl{
+    font-family: cursive;
+    font-size: 30px;
+    text-align: center;
+}
+h2{
+    font-family: cursive;
+    font-size: 40px;
+    color: green;
+    text-align: center;
+}
+#rodape {
+    display: inline-block;
+    text-align:right;
+    border: 1px solid black;
+    margin-left: 1610px;
+}
+a:link:active, a:visited:active{
+    color: green;
+}
+a:link, a:visited{
+    color: green;
+    text-decoration: solid;
+}
+a.instr{
+    display: inline-block;
+    padding: 10px, 30px;
+    background-color: burlywood;
+    text-decoration: solid;
+    border-radius: 1px;
+    font-size: 40px;
+    border: 3px solid brown;
+}
+a.botao{
+    display: inline-block;
+    padding: 10px, 30px;
+    background-color: burlywood;
+    text-decoration: solid;
+    border-radius: 1px;
+    font-size: 40px;
+    border: 3px solid brown;
+}
+a.botao:hover{
+    font-size: 40px;
+    border-radius: 1px;
+}
+a.instr:hover{
+    font-size: 40px;
+    border-radius: 1px;
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Perguntas</title>
+    <link rel="stylesheet" href="perguntas.css">
+    <script>
+        function rsptSim(event) {
+            event.preventDefault();
+            const audio = document.getElementById("audioCorreto");
+            audio.play();
+            audio.onended = function () {
+                window.location.href = "p2.html";
+            };
+        }
+        function rsptNao(event) {
+            event.preventDefault();
+            const audio = document.getElementById("audioErrado");
+            audio.play();
+            audio.onended = function () {
+                alert("Todos os seres realizam respiração celular!  >:(");
+                window.location.href = "site.html";
+            };
+        }
+    </script>
+</head>
+<body>
+    <h1>Responda bem:</h1>
+    <br><br><br><br><br><br><br>
+    <h2>Você realiza respiração celular?</h2>
+    <br><br><br><br><br>
+    <div class="botoes">
+        <button onclick="rsptSim(event)">Sim</button>
+        <button onclick="rsptNao(event)">Não</button>
+    </div>
+    <audio id="audioCorreto" src="sons/correto.mp3"></audio>
+    <audio id="audioErrado" src="sons/errado.mp3"></audio>
+</body>
+</html>

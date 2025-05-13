@@ -1,0 +1,36 @@
+body{
+    background-color: lightgray;
+    font-family: cursive;
+    text-align: center;
+}
+h1{
+    color: darkgreen;
+    font-size: 75px;
+}
+h2{
+    font-size: 60px;
+}
+h3{
+    font-size: 30px;
+}
+button{
+    font-family: cursive;
+    padding: 5px;
+    font-size: 30px;
+    text-decoration: solid;
+    border-radius: 1px;
+    background-color: lightcoral;
+    color: rgb(128, 0, 0);
+}
+a:link:active, a:visited:active{
+    color: rgb(128, 0, 0);
+    text-decoration: solid;
+}
+a:link, a:visited{
+    color: rgb(128, 0, 0);
+    text-decoration: solid;
+}
+button:hover{
+    font-size: 40px;
+    border-radius: 1px;
+}

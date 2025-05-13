@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Perguntas</title>
+    <link rel="stylesheet" href="perguntas.css">
+    <script>
+        function rsptNao(event) {
+            event.preventDefault();
+            const audio = document.getElementById("audioErrado");
+            audio.play();
+            audio.onended = function () {
+                alert("Energia é vital para qualquer tipo de vida!");
+                window.location.href = "site.html";
+            };
+        }
+        function rsptSim(event) {
+            event.preventDefault();
+            const audio = document.getElementById("audioSim");
+            audio.play();
+            audio.onended = function () {
+                window.location.href = "p5.html";
+            };
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Responda bem:</h1>
+    <br><br><br><br><br><br><br>
+    <h2>Você precisa de algum tipo de energia para sobreviver?</h2>
+    <br><br><br><br><br>
+    <div class="botoes">
+        <button onclick="rsptSim(event)">Sim</button>
+        <button onclick="rsptNao(event)">Não</button>
+    </div>
+    <audio id="audioSim" src="sons/correto.mp3"></audio>
+    <audio id="audioErrado" src="sons/errado.mp3"></audio>
+</body>
+</html>
