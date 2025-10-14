@@ -1,0 +1,369 @@
+:root{
+  --bg:#2d1a06; 
+  --card:#3a2410; 
+  --accent:#b8893a;
+  --hp-color:#b22222; 
+  --mp-color:#2e4a7d; 
+  --txt-yellow:#ffe58a; 
+  --txt-blue:#b8c6e0;
+  --border-gold: #c9a14a;
+  --parchment: #f6ecd2;
+  --shadow: #1a1104;
+}
+*{
+  box-sizing:border-box;
+  font-family: 'UnifrakturCook', 'IM Fell English', 'Cinzel Decorative', 'Inter', system-ui, serif;
+  letter-spacing: 0.5px;
+}
+body{
+  margin:0;
+  background:linear-gradient(180deg,#2d1a06 0%, #4b2e0e 100%);
+  color:var(--txt-yellow);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:12px;
+}
+.wrap{
+  width:1180px;
+  max-width:98%;
+  background:var(--card);
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 14px 40px #1a1104cc, 0 0 0 6px var(--border-gold);
+  border:4px solid var(--border-gold);
+}
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+h1{
+  margin:0;
+  font-size:26px;
+  color:var(--txt-yellow);
+  font-family:'Cinzel Decorative','UnifrakturCook',serif;
+  letter-spacing:2px;
+  text-shadow: 2px 2px 0 #000, 0 0 8px #c9a14a88;
+}
+.hint{
+  color:var(--txt-blue);
+  font-size:14px;
+  font-family:'IM Fell English',serif;
+  background:rgba(246,236,210,0.08);
+  padding:4px 10px;
+  border-radius:6px;
+  border:1px solid #c9a14a33;
+}
+main{
+  display:grid;
+  grid-template-columns:230px 1fr 230px;
+  gap:12px;
+  align-items:start;
+}
+.side-card{
+  background:linear-gradient(180deg,#4b2e0e,#2d1a06 80%);
+  padding:14px;
+  border-radius:14px;
+  border:2px solid var(--border-gold);
+  box-shadow:0 6px 24px #1a1104aa;
+}
+.side-title{
+  font-weight:800;
+  color:var(--txt-yellow);
+  font-family:'Cinzel Decorative','UnifrakturCook',serif;
+  font-size:18px;
+  letter-spacing:1px;
+  text-shadow: 1px 1px 0 #000;
+}
+.stat-label{
+  color:var(--txt-blue);
+  font-size:14px;
+  margin-top:8px;
+  font-family:'IM Fell English',serif;
+}
+.bar {
+ position: relative;
+ height: 16px;
+ background: rgba(201,161,74,0.10);
+ border-radius: 8px;
+ overflow: hidden;
+ margin-top: 6px;
+ border: 1.5px solid var(--border-gold);
+ box-shadow: 0 2px 8px #1a110422;
+}
+
+
+#p1hp, #p2hp {
+ background: linear-gradient(90deg, var(--hp-color), #7e1c1c 80%);
+ position: absolute;
+ left: 0; top: 0; bottom: 0;
+ height: 100%;
+ border-radius: 8px;
+ z-index: 1;
+ transition: width 420ms cubic-bezier(.2,.9,.2,1);
+}
+
+
+#p1mp, #p2mp {
+ background: linear-gradient(90deg, var(--mp-color), #1e2c4a 80%);
+ position: absolute;
+ left: 0; top: 0; bottom: 0;
+ height: 100%;
+ border-radius: 8px;
+ z-index: 1;
+ transition: width 420ms cubic-bezier(.2,.9,.2,1);
+}
+
+
+.hp-shield-bar {
+ position: absolute;
+ left: 0; top: 0; bottom: 0;
+ height: 100%;
+ background: linear-gradient(90deg, #7fd6ff 60%, #b8eaff 100%);
+ opacity: 0.85;
+ border-radius: 8px;
+ z-index: 2;
+ pointer-events: none;
+ transition: width 420ms cubic-bezier(.2,.9,.2,1);
+ mix-blend-mode: lighten;
+ box-shadow: 0 0 6px #b8eaff88;
+}
+.val{
+  color:var(--txt-blue);
+  margin-top:8px;
+  font-family:'IM Fell English',serif;
+}
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.battle{
+  position:relative;
+  height:640px;
+  border-radius:14px;
+  background:linear-gradient(180deg,#3a2410 0%,#2d1a06 100%);
+  border:2px solid var(--border-gold);
+  overflow:hidden;
+  box-shadow:0 8px 32px #1a1104cc;
+}
+.fx{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:60;
+}
+.char{
+  position:absolute;
+  width:170px;
+  height:170px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:50;
+}
+#p1{left:5%;bottom:5%}
+#p2{right:5%;top:5%}
+.shape-box{
+  width:150px;
+  height:150px;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  color:#2d1a06;
+  box-shadow:0 12px 36px #1a1104cc;
+  overflow:hidden;
+  background:var(--parchment);
+  border:2.5px solid var(--border-gold);
+}
+.shape-box img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.spells{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:8px;
+  max-height:300px;
+  overflow:auto;
+}
+.spell-btn{
+  padding:10px 12px;
+  border-radius:8px;
+  border:2px solid var(--border-gold);
+  background:linear-gradient(90deg,#f6ecd2 80%,#e2c88e 100%);
+  color:#3a2410;
+  cursor:pointer;
+  text-align:left;
+  font-family:'IM Fell English',serif;
+  font-size:16px;
+  font-weight:bold;
+  box-shadow:0 2px 8px #c9a14a22;
+}
+.spell-btn[disabled]{
+  opacity:0.45;
+  cursor:not-allowed;
+  background:linear-gradient(90deg,#e2c88e 80%,#c9a14a 100%);
+  color:#7c6b3a;
+}
+.btn{
+  padding:10px 12px;
+  border-radius:8px;
+  border:2px solid var(--border-gold);
+  background:linear-gradient(90deg,#f6ecd2 80%,#e2c88e 100%);
+  color:#3a2410;
+  cursor:pointer;
+  font-family:'Cinzel Decorative','IM Fell English',serif;
+  font-size:16px;
+  font-weight:bold;
+  box-shadow:0 2px 8px #c9a14a22;
+}
+.btn.primary{
+  background:linear-gradient(90deg,#b8893a 80%,#c9a14a 100%);
+  color:#fffbe6;
+}
+.small{
+  font-size:13px;
+  color:var(--txt-blue);
+  font-family:'IM Fell English',serif;
+}
+.log{
+  background:rgba(246,236,210,0.10);
+  padding:12px;
+  border-radius:12px;
+  height:140px;
+  overflow:auto;
+  color:var(--txt-blue);
+  border:2px solid var(--border-gold);
+  font-family:'IM Fell English',serif;
+  font-size:15px;
+}
+.proj{
+  position:absolute;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transform:translate(0,0);
+  transition:transform 700ms cubic-bezier(.22,1,.36,1);
+  z-index:70;
+  border-radius:999px;
+}
+.proj.fire{
+  width:44px;
+  height:44px;
+  background:radial-gradient(circle at 30% 30%, #ffd27a,#b8893a);
+  box-shadow:0 10px 30px #b8893a88;
+}
+.proj.ice{
+  width:36px;
+  height:48px;
+  border-radius:8px;
+  background:linear-gradient(180deg,#e2e9f6,#b8c6e0);
+  box-shadow:0 8px 20px #b8c6e044;
+  transform-origin:center;
+}
+.proj.shadow{
+  width:38px;
+  height:38px;
+  background:linear-gradient(180deg,#cbbdff,#7c5ef8);
+  box-shadow:0 10px 30px #4b2e0e55;
+}
+.impact{
+  position:absolute;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  z-index:72;
+  opacity:0;
+}
+.impact.fire{
+  width:110px;
+  height:110px;
+  background:radial-gradient(circle,#ffe7b0,rgba(201,161,74,0.06));
+  box-shadow:0 10px 40px #b8893a44;
+  animation:impactIn 420ms forwards;
+}
+.impact.ice{
+  width:90px;
+  height:90px;
+  background:radial-gradient(circle,#e8fbff,rgba(120,200,255,0.06));
+  box-shadow:0 8px 30px #b8c6e044;
+  animation:impactIn 420ms forwards;
+}
+.impact.heal{
+  width:100px;
+  height:100px;
+  background:radial-gradient(circle,#f6ecd2,rgba(201,161,74,0.06));
+  box-shadow:0 8px 30px #c9a14a22;
+  animation:impactIn 420ms forwards;
+}
+@keyframes impactIn { 0%{transform:translate(-50%,-50%) scale(0.2);opacity:1} 100%{transform:translate(-50%,-50%) scale(1);opacity:0} }
+.shield-ring{
+  position:absolute;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  border:4px solid #c9a14a99;
+  box-shadow:0 10px 40px #c9a14a33;
+  animation:shieldPulse 900ms ease-out;
+  z-index:71;
+}
+@keyframes shieldPulse{0%{transform:translate(-50%,-50%) scale(0.6);opacity:0.9}100%{transform:translate(-50%,-50%) scale(1.12);opacity:0}}
+.modal{
+  position:fixed;
+  inset:0;
+  background:linear-gradient(180deg,rgba(45,26,6,0.7),rgba(75,46,14,0.95));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+.modal-card{
+  background:#f6ecd2;
+  padding:18px;
+  border-radius:14px;
+  width:780px;
+  border:2px solid var(--border-gold);
+  box-shadow:0 6px 24px #1a1104aa;
+  color:#3a2410;
+  font-family:'IM Fell English',serif;
+}
+.row{display:flex;gap:12px;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:8px}
+input[type=color]{
+  width:48px;
+  height:36px;
+  border:2px solid var(--border-gold);
+  background:var(--parchment);
+  border-radius:6px;
+}
+input[type=file]{color:var(--txt-yellow)}
+@media (max-width:1000px){
+  main{grid-template-columns:180px 1fr 180px}
+  .battle{height:520px}
+  .wrap{width:96%}
+}
+button[onclick="toggleSoundtrack()"] {
+ padding: 10px 12px;
+ border-radius: 8px;
+ border: 2px solid var(--border-gold);
+ background: linear-gradient(90deg,#b8893a 80%,#c9a14a 100%);
+ color: #fffbe6;
+ font-size: 16px;
+ font-family:'Cinzel Decorative','IM Fell English',serif;
+ font-weight: bold;
+ margin-right: 10px;
+ box-shadow:0 2px 8px #c9a14a22;
+}
+button[onclick="toggleSoundtrack()"]:hover {
+ background: #a67c2d;
+ color: #fffbe6;
+}

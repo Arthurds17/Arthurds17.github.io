@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Striker Heroes</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=IM+Fell+English&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Striker Heroes</h1>
+      <button onclick="toggleSoundtrack()">Pausar/Retomar Música</button>
+      <div class="hint">P1 (esquerda) — P2 (direita). Faça 1 ação por turno, depois clique em Terminar Turno.</div>
+    </header>
+
+    <main>
+      <aside class="side">
+        <div class="side-card">
+          <div class="side-title">Jogador 1</div>
+
+          <div class="stat-label">HP</div>
+          <div class="bar"><i id="p1hp"></i></div>
+          <div class="val"><span id="p1hpTxt">100</span> / <span id="p1max">100</span></div>
+
+          <div class="stat-label">MP</div>
+          <div class="bar"><i id="p1mp"></i></div>
+          <div class="val"><span id="p1mpTxt">50</span> / <span id="p1mpmax">50</span></div>
+
+          <hr/>
+
+          <div class="side-title small">Ações (Jogador 1)</div>
+          <div id="spells1" class="spells"></div>
+
+          <div style="margin-top:10px;display:flex;gap:8px;">
+            <button id="endLeft" class="btn primary">Terminar Turno</button>
+            <button id="medLeft" class="btn">Meditar</button>
+          </div>
+        </div>
+      </aside>
+
+      <section class="field">
+        <div class="battle" id="battle">
+          <div id="p1" class="char">
+            <div id="p1box" class="shape-box"><span id="p1label">P1</span></div>
+          </div>
+
+          <div id="p2" class="char">
+            <div id="p2box" class="shape-box"><span id="p2label">P2</span></div>
+          </div>
+
+          <div id="fx" class="fx"></div>
+        </div>
+
+        <div class="log-and-aux">
+          <div class="log" id="log"></div>
+          <div class="hint small">Dica: "Meditar" recupera MP. Depois de usar uma ação, clique em Terminar Turno.</div>
+        </div>
+      </section>
+
+      <aside class="side">
+        <div class="side-card">
+          <div class="side-title">Jogador 2</div>
+
+          <div class="stat-label">HP</div>
+          <div class="bar"><i id="p2hp"></i></div>
+          <div class="val"><span id="p2hpTxt">110</span> / <span id="p2max">110</span></div>
+
+          <div class="stat-label">MP</div>
+          <div class="bar"><i id="p2mp"></i></div>
+          <div class="val"><span id="p2mpTxt">55</span> / <span id="p2mpmax">55</span></div>
+
+          <hr/>
+
+          <div class="side-title small">Ações (Jogador 2)</div>
+          <div id="spells2" class="spells"></div>
+
+          <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end;">
+            <button id="endRight" class="btn primary">Terminar Turno</button>
+            <button id="medRight" class="btn">Meditar</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-card">
+      <h3>Configurar Jogadores</h3>
+      <div class="row">
+        <div class="col">
+          <label class="small">Cor Jogador 1</label>
+          <input id="color1" type="color" value="#ffd27a">
+          <label class="small" style="margin-top:8px">Imagem (opcional)</label>
+          <input id="img1" type="file" accept="image/*">
+        </div>
+
+        <div class="col">
+          <label class="small">Cor Jogador 2</label>
+          <input id="color2" type="color" value="#a0d2ff">
+          <label class="small" style="margin-top:8px">Imagem (opcional)</label>
+          <input id="img2" type="file" accept="image/*">
+        </div>
+
+        <div style="margin-left:auto">
+          <label class="small">Preset Vida / Mana</label>
+          <select id="preset">
+            <option value="default">Padrão (100/50 e 110/55)</option>
+            <option value="balanced">Equilibrado (105/55 cada)</option>
+          </select>
+
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+            <button id="start" class="btn primary">Iniciar</button>
+            <button id="cancel" class="btn">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="script.js"></script>
+</body>
+</html>
