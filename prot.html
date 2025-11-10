@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgroResiste - Sistema de Gestão e Recuperação Agroclimática</title>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+  <style>
+    :root{
+      --green-700: #0c8f4f;
+      --green-800: #0a6d3c;
+      --blue-600: #0077b6;
+      --muted-bg: #f3fbf8;
+      --card-bg: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(243,251,248,0.9));
+      --accent: rgba(0,119,182,0.06);
+      --text: #072b2a;
+    }
+
+    html,body{height:100%;}
+    body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: radial-gradient(circle at 10% 10%, rgba(0,119,182,0.04), transparent 20%), linear-gradient(180deg,#eaf7f5,#f7fbfd); margin: 0; color: var(--text); }
+    header { background: linear-gradient(90deg, var(--green-700), var(--blue-600)); color: white; padding: 18px 26px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 18px rgba(2,40,35,0.12); position: relative; }
+    header h1{display:flex;align-items:center;gap:10px;font-size:20px;margin:0}
+    header .brand-leaf{width:36px;height:36px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.15));}
+    nav{display:flex;gap:8px;align-items:center}
+    nav button { background-color: rgba(255,255,255,0.97); color: var(--blue-600); border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 6px rgba(12,143,79,0.06); transition: transform .12s ease, box-shadow .12s ease; }
+    nav button:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(12,143,79,0.12); }
+    nav button:active{transform:translateY(0)}
+    nav button.active{background:linear-gradient(90deg,var(--green-700),var(--blue-600)); color:white; box-shadow:none}
+
+    main { max-width: 1100px; margin: 20px auto; background: transparent; border-radius: 10px; padding: 8px; }
+    .hero { background: linear-gradient(90deg, rgba(12,143,79,0.08), rgba(0,119,182,0.06)); border-radius: 10px; padding: 18px; margin-bottom: 14px; display:flex; justify-content:space-between; align-items:center; }
+    .hero .tagline{font-size:18px;color:rgba(2,40,35,0.9);font-weight:600}
+    section { display: none; }
+    section.active { display: block; }
+    .card { background: var(--card-bg); border: 1px solid rgba(4,85,72,0.06); padding: 16px; margin-bottom: 14px; border-radius: 10px; box-shadow: 0 6px 20px rgba(2,40,35,0.04); }
+    .card h3{color:var(--blue-600);margin-top:0}
+    .btn { background: linear-gradient(90deg,var(--green-700),var(--blue-600)); color: white; border: none; border-radius: 8px; padding: 9px 16px; cursor: pointer; font-weight:700; box-shadow: 0 6px 18px rgba(2,40,35,0.12); transition: transform .12s ease; }
+    .btn:hover { transform: translateY(-2px); }
+    footer { text-align: center; padding: 14px; margin-top: 20px; font-size: 14px; color: #0b3b3b; }
+    input, textarea { width: 100%; padding: 10px; margin-top: 6px; border: 1px solid rgba(3,60,52,0.08); border-radius: 8px; background: white; }
+    h2 { color: var(--blue-600); text-transform: none; }
+    /* Map styles */
+    #map { height: 480px; border-radius: 10px; border: 1px solid rgba(3,60,52,0.06); box-shadow: inset 0 -10px 30px rgba(0,0,0,0.03); }
+    .legend { background: rgba(255,255,255,0.95); padding: 10px; border-radius: 8px; font-size: 14px; box-shadow: 0 6px 18px rgba(2,40,35,0.06); }
+    /* small responsive tweaks */
+    @media(max-width:780px){ header{padding:12px 14px} .hero{flex-direction:column;gap:10px;text-align:center} nav{flex-wrap:wrap} }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>
+      <span style="margin-left:6px;">🌾 AgroResiste</span>
+    </h1>
+    <nav>
+      <button onclick="showSection('quem')">Quem Somos Nós</button>
+      <button onclick="showSection('dashboard')">Dashboard</button>
+      <button onclick="showSection('registro')">Registrar Perda</button>
+      <button onclick="showSection('gestao')">Painel Gestor</button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div class="tagline">Monitoramento agroclimático e apoio à tomada de decisão para reduzir perdas por enchentes.</div>
+      <div style="font-size:13px;color:rgba(2,40,35,0.7);">Dados: <strong>ANA</strong> • <strong>OpenWeatherMap</strong></div>
+    </div>
+
+    <section id="quem">
+      <h2>Quem Somos Nós / Nosso Problema e Solução</h2>
+      <div class="card">
+        <p>Somos uma equipe de estudantes dedicada ao desenvolvimento de soluções para monitoramento agroclimático e apoio a comunidades afetadas por eventos climáticos extremos. Nosso objetivo é criar ferramentas simples e úteis para auxiliar todos aqueles que precisam.</p>
+        <h3>Equipe</h3>
+        <ul>
+          <li>Arthur Santos de Mattos</li>
+          <li>Ariane Natalia Dos Santos</li>
+          <li>Carlos Eduardo Bertollo</li>
+          <li>Laura Zanella Severo Da Silva</li>
+          <li>Isabele Ferrari Alves</li>
+        </ul>
+
+        <h3 style="margin-top:12px;">Nosso Problema</h3>
+        <p><strong>Interrupção da produção e distribuição de alimentos no setor agropecuário.</strong></p>
+
+        <h4>Descrição</h4>
+        <p>As enchentes devastaram plantações inteiras de arroz, milho e hortaliças, além de destruir pastagens e instalações rurais. Com isso, produtores perderam safras, animais e maquinários. As estradas alagadas e pontes destruídas impediram o transporte de grãos, leite e carne, causando desabastecimento em mercados locais e aumento de preços.</p>
+
+        <h4>Consequências diretas</h4>
+        <ul>
+          <li>Perda de colheitas e rebanhos.</li>
+          <li>Dificuldade de escoar a produção.</li>
+          <li>Falta de alimentos e insumos nas cidades.</li>
+          <li>Aumento do preço de produtos básicos.</li>
+          <li>Endividamento de pequenos produtores rurais.</li>
+        </ul>
+
+        <h4>Exemplo real</h4>
+        <p>Na região de Pelotas e Rio Pardo, muitos produtores de arroz perderam quase toda a safra, pois os campos ficaram submersos por semanas, inviabilizando a colheita e o replantio.</p>
+
+        <h4>Nossa solução</h4>
+        <p>Esta plataforma monitora as condições climáticas e hidrológicas locais (integração com fontes públicas como ANA e serviços meteorológicos) para fornecer alertas e informações operacionais. O objetivo é antecipar riscos, apoiar decisões de emergência e reduzir perdas por meio de ações mais rápidas e coordenadas.</p>
+      </div>
+
+    </section>
+
+    <section id="dashboard" class="active">
+      <h2>Monitoramento e Mapa de Risco - Rio Grande do Sul (tempo real)</h2>
+      <div class="card">
+        <h3>Mapa Interativo (estações hidrométricas)</h3>
+        <div id="map"></div>
+        <div style="margin-top:8px;">
+          <small>Dados em tempo real providos por sistemas públicos (ex.: ANA - Hidroweb). Se os dados em tempo real não carregarem, use o botão <i>Carregar Exemplo</i> como fallback.</small>
+          <div style="margin-top:6px;">
+            <button class="btn" onclick="loadExampleMarkers()">Carregar Exemplo</button>
+            <button class="btn" style="background:#0077b6;margin-left:8px;" onclick="tryLoadAna()">Tentar conectar Hidroweb (ANA)</button>
+            <button class="btn" style="background:#0a6d3c;margin-left:8px;" onclick="configureWeatherKey()">Configurar API Meteo</button>
+            <button class="btn" style="background:#6c757d;margin-left:8px;" onclick="loadCitiesMarkers()">Carregar Cidades RS</button>
+          </div>
+          <div style="margin-top:6px;"><small id="weatherStatus">API Meteo: não configurada</small></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Alertas Climáticos</h3>
+        <ul id="alertList">
+          <li><b>Alto:</b> Risco de enchente nas próximas 24h — Rio Pardo - RS</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="registro">
+      <h2>Registrar Perda / Solicitar Apoio</h2>
+      <form id="formPerda">
+        <label>Nome do Produtor:</label>
+        <input type="text" id="nome" required>
+        <label>Local / Município:</label>
+        <input type="text" id="local" required>
+        <label>Descrição da Perda:</label>
+        <textarea id="perda"></textarea>
+        <label>Solicitação (ração, sementes, combustível...):</label>
+        <input type="text" id="solicitacao">
+        <button type="submit" class="btn" style="margin-top:10px;">Registrar</button>
+      </form>
+      <div id="mensagem" style="margin-top:10px;color:#0c8f4f;font-weight:bold;"></div>
+
+      <div class="card" style="margin-top:12px;">
+        <h3>Orientações: Recuperação do Solo Alagado e Replantio</h3>
+        <p><em>Como recuperar o solo alagado</em> — Após a retirada das águas, permita que o solo drene e seque parcialmente antes de qualquer intervenção. Remova detritos e restos contaminados (resíduos, embalagens, animais mortos) com segurança. Evite operações pesadas com máquinas enquanto o solo estiver muito úmido para não compactá-lo. Faça análise de solo quando possível; adições de matéria orgânica (composto) e aplicações corretivas como calagem devem ser feitas conforme recomendação técnica. Procure controlar pragas e doenças que se proliferam em campos alagados monitorando plantas e aplicando tratamentos localizados e certificados apenas quando necessário para evitar contaminações.</p>
+
+        <p><em>Indicação de sementes resistentes e replantio sustentável</em> — Prefira sementes certificadas e cultivares que apresentem maior tolerância à umidade e encharcamento para a cultura específica da sua região. Considere variedades de ciclo mais curto para reduzir risco em janelas climáticas adversas. Use práticas sustentáveis ao replantar: preparo mínimo do solo, rotação de culturas (incluir leguminosas para recuperação de nitrogênio), e plantio em faixas ou parcelas piloto para testar o desempenho antes de cobrir grandes áreas. Tratamentos de sementes e o uso de sementes com maior vigor podem ajudar na recuperação, mas sempre prefira orientação técnica local (assistência técnica rural/extensionistas) para escolher as melhores variedades e doses de manejo.</p>
+
+        <p style="font-size:13px;color:#064a43;margin-top:8px;"><strong>Observação:</strong> essas medidas ajudam a reduzir riscos de pragas e contaminações e a recuperar a capacidade produtiva do solo, mas devem ser aplicadas com apoio técnico e monitoramento contínuo.</p>
+      </div>
+    </section>
+
+    <section id="gestao">
+      <h2>Painel de Gestão</h2>
+
+      <div class="card">
+        <h3>Ações Rápidas</h3>
+        <button class="btn" onclick="gerarRelatorio()">Gerar Relatório de Perdas</button>
+      </div>
+
+      <div class="card">
+        <h3>Status das Vias</h3>
+        <div style="margin-bottom:15px;">
+          <h4 style="color:#d32f2f;margin:0 0 8px 0;font-size:15px;">🚫 Ruas Bloqueadas</h4>
+          <ul style="margin:0;color:#d32f2f;">
+            <li>Taquari (nível alto - 3.8m)
+              <ul style="font-size:14px;margin-top:4px;">
+                <li>Rua Júlio de Castilhos (BLOQUEADA)</li>
+                <li>Av. Oswaldo Aranha próx. ao rio (BLOQUEADA)</li>
+              </ul>
+            </li>
+            <li>Uruguaiana (nível crítico - 4.2m)
+              <ul style="font-size:14px;margin-top:4px;">
+                <li>Av. Presidente Vargas (BLOQUEADA)</li>
+                <li>Rua Duque de Caxias próx. à ponte (BLOQUEADA)</li>
+              </ul>
+            </li>
+            <li>Rio Pardo (nível crítico - 4.8m)
+              <ul style="font-size:14px;margin-top:4px;">
+                <li>Rua Andrade Neves (BLOQUEADA)</li>
+                <li>Av. Rio Branco próx. ao cais (BLOQUEADA)</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <div style="margin-bottom:15px;">
+          <h4 style="color:#f4a024;margin:0 0 8px 0;font-size:15px;">🔄 Rotas Alternativas Recomendadas</h4>
+          <ul style="margin:0;color:#945400;">
+            <li>Para Taquari:
+              <ul style="font-size:14px;margin-top:4px;">
+                <li>Rua Manoel Pereira da Silva → RS-436</li>
+                <li>Acesso pela RS-128 → Estrela</li>
+              </ul>
+            </li>
+            <li>Para Uruguaiana:
+              <ul style="font-size:14px;margin-top:4px;">
+                <li>BR-290 → Av. Setembrino de Carvalho</li>
+                <li>Contorno pela BR-472</li>
+              </ul>
+            </li>
+            <li>Para Rio Pardo:
+              <ul style="font-size:14px;margin-top:4px;">
+                <li>RS-471 → Rua João Pessoa</li>
+                <li>Acesso alternativo: BR-290 → RS-403</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style="color:#2e7d32;margin:0 0 8px 0;font-size:15px;">✅ Rotas Principais Liberadas</h4>
+          <ul style="margin:0;color:#2e7d32;">
+            <li>BR-392 (Porto de Rio Grande → Pelotas) - Tráfego normal</li>
+            <li>RS-240 (São Leopoldo → Montenegro) - Liberada</li>
+            <li>BR-116 (Caxias → Porto Alegre) - Sem bloqueios</li>
+            <li>RS-287 (Santa Maria → Montenegro) - Tráfego normal</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Impactos Esperados</h3>
+        <p>Ao integrar alertas antecipados, planos de contingência e rotas alternativas, esperamos reduzir de forma expressiva as perdas de safra. Alertas oportunos permitem que produtores adotem medidas preventivas — como retirada de máquinas, proteção de sementes e realocação de animais — minimizando danos imediatos e preservando parte da produção.</p>
+
+        <p>O mapeamento de rotas alternativas e o monitoramento contínuo contribuem para a melhoria do escoamento da produção, reduzindo atrasos no transporte de grãos, leite e carne. Com estradas alternativas identificadas e comunicação mais ágil, cadeias de abastecimento locais ficam menos vulneráveis a interrupções.</p>
+
+        <p>Além disso, a plataforma aumenta a agilidade na comunicação e no recebimento de auxílio, conectando demandas locais com prefeituras, cooperativas e redes de apoio. Isso ajuda a reduzir o tempo entre o registro da perda e a resposta efetiva, diminuindo o risco de endividamento de pequenos produtores.</p>
+
+        <p>Por fim, ao combinar monitoramento, assistência técnica e práticas sustentáveis de recuperação, a iniciativa fortalece a resiliência rural frente a desastres climáticos, tornando as comunidades mais preparadas para enfrentar eventos extremos e retomar a produção com maior rapidez.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Protótipo Interativo — AgroResiste © 2025. Dados hidrológicos em tempo real: ANA (Hidroweb) e Defesa Civil RS.
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script>
+    // --- Configuração: API key do OpenWeatherMap já configurada ---
+    const OPENWEATHERMAP_API_KEY = 'f5161bd803539c4f3b4ed4d4cf0ff1e3';
+    
+    // Variáveis globais
+    let map = L.map('map').setView([-30.0, -53.5], 6);
+
+    // Camada de tiles (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Grupo de marcadores para estações
+    let stationsLayer = L.layerGroup().addTo(map);
+
+    // Função para carregar marcadores de exemplo (fallback)
+    function loadExampleMarkers() {
+      stationsLayer.clearLayers();
+      const examples = [
+        { id: 1, name: 'Estação Hidro - Porto Alegre (Guaíba)', lat: -30.0346, lon: -51.2177, level: 2.8, river: 'Lago Guaíba' },
+        { id: 2, name: 'Estação Hidro - Rio Pardo', lat: -30.928, lon: -52.033, level: 4.8, river: 'Rio Jacuí' },
+        { id: 3, name: 'Estação Hidro - Santa Maria', lat: -29.684, lon: -53.806, level: 1.9, river: 'Rio Vacacaí' },
+        { id: 4, name: 'Estação Hidro - São Jerônimo', lat: -29.9572, lon: -51.7247, level: 3.2, river: 'Rio Jacuí' },
+        { id: 5, name: 'Estação Hidro - Uruguaiana', lat: -29.7450, lon: -57.0878, level: 4.2, river: 'Rio Uruguai' },
+        { id: 6, name: 'Estação Hidro - Taquari', lat: -29.7947, lon: -51.8675, level: 3.8, river: 'Rio Taquari' },
+        { id: 7, name: 'Estação Hidro - Estrela', lat: -29.5006, lon: -51.9647, level: 4.1, river: 'Rio Taquari' },
+        { id: 8, name: 'Estação Hidro - Encantado', lat: -29.2353, lon: -51.8717, level: 3.9, river: 'Rio Taquari' },
+        { id: 9, name: 'Estação Hidro - São Sebastião do Caí', lat: -29.5872, lon: -51.3747, level: 2.7, river: 'Rio Caí' },
+        { id: 10, name: 'Estação Hidro - Alegrete', lat: -29.7828, lon: -55.7919, level: 3.5, river: 'Rio Ibirapuitã' }
+      ];
+
+      // Limpa alertas automáticos de nível de rio
+      const alertList = document.getElementById('alertList');
+      if (alertList) {
+        Array.from(alertList.querySelectorAll('.auto-river-alert')).forEach(el => el.remove());
+      }
+
+      examples.forEach(s => {
+        const color = s.level >= 4 ? 'red' : (s.level >= 2 ? 'orange' : 'green');
+        const marker = L.circleMarker([s.lat, s.lon], { radius:8, color }).addTo(stationsLayer);
+        marker.bindPopup(`<b>${s.name}</b><br/><strong>${s.river}</strong><br/>Nível atual: ${s.level} m`);
+        // ALERTA: nível acima de 4 metros
+        if (s.level >= 4) {
+          if (alertList) {
+            const li = document.createElement('li');
+            li.className = 'auto-river-alert';
+            li.innerHTML = `<b>Alerta:</b> Nível elevado (${s.level} m) em ${s.name} (RS)`;
+            alertList.appendChild(li);
+          }
+        }
+      });
+      if (stationsLayer.getLayers().length) map.fitBounds(stationsLayer.getBounds(), { padding: [40,40] });
+    }
+
+    // Carrega uma lista padrão de cidades do RS e pré-busca o clima para cada uma
+    async function loadCitiesMarkers() {
+      stationsLayer.clearLayers();
+      const cities = [
+        { name: 'Porto Alegre', lat: -30.0346, lon: -51.2177 },
+        { name: 'Pelotas', lat: -31.7641, lon: -52.3375 },
+        { name: 'Santa Maria', lat: -29.6846, lon: -53.8069 },
+        { name: 'Caxias do Sul', lat: -29.1678, lon: -51.1795 },
+        { name: 'Passo Fundo', lat: -28.2619, lon: -52.4069 },
+        { name: 'Rio Grande', lat: -32.0358, lon: -52.0986 },
+        { name: 'Uruguaiana', lat: -29.7619, lon: -57.0886 },
+        { name: 'Alegrete', lat: -29.7869, lon: -55.7947 },
+        { name: 'Farroupilha', lat: -29.2288, lon: -51.3411 },
+        { name: 'São Leopoldo', lat: -29.7633, lon: -51.1506 }
+      ];
+
+      // Limpa alertas automáticos
+      const alertList = document.getElementById('alertList');
+      if (alertList) {
+        // Remove alertas automáticos anteriores
+        Array.from(alertList.querySelectorAll('.auto-alert')).forEach(el => el.remove());
+      }
+
+      for (const c of cities) {
+        const weather = await fetchWeather(c.lat, c.lon);
+        const title = `<b>${c.name}</b>`;
+        let popup = title + '<br/>';
+        if (weather && weather.main) {
+          const desc = weather.weather && weather.weather[0] ? weather.weather[0].description : '';
+          const temp = weather.main.temp;
+          const hum = weather.main.humidity;
+          // Vento em m/s para km/h
+          const wind = weather.wind ? weather.wind.speed : 'N/D';
+          const windKmh = typeof wind === 'number' ? wind * 3.6 : 0;
+          const icon = weather.weather && weather.weather[0] && weather.weather[0].icon ? `<img src="https://openweathermap.org/img/wn/${weather.weather[0].icon}.png" style="vertical-align:middle;"> ` : '';
+          popup += `${icon}<strong>${temp} °C</strong> — ${desc}<br/>Hum: ${hum}% — Vento: ${windKmh.toFixed(1)} km/h`;
+
+          // ALERTA: vento > 90 km/h
+          if (windKmh > 90) {
+            if (alertList) {
+              const li = document.createElement('li');
+              li.className = 'auto-alert';
+              li.innerHTML = `<b>Alerta:</b> Vento extremo (${windKmh.toFixed(1)} km/h) em ${c.name} (RS)`;
+              alertList.appendChild(li);
+            }
+          }
+        } else {
+          popup += 'Tempo indisponível (verifique API key)';
+        }
+        const marker = L.marker([c.lat, c.lon]).addTo(stationsLayer);
+        marker.bindPopup(popup);
+      }
+      if (stationsLayer.getLayers().length) map.fitBounds(stationsLayer.getBounds(), { padding: [40,40] });
+    }
+
+    // --- Integração com OpenWeatherMap (condições meteorológicas) ---
+    async function fetchWeather(lat, lon) {
+      if (!OPENWEATHERMAP_API_KEY || OPENWEATHERMAP_API_KEY === 'COLOQUE_SUA_API_KEY_AQUI') {
+        console.warn('OpenWeatherMap API key não configurada.');
+        return null;
+      }
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=pt_br&appid=${OPENWEATHERMAP_API_KEY}`;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        return data;
+      } catch (err) {
+        console.error('Erro ao buscar tempo:', err);
+        return null;
+      }
+    }
+
+    function showWeatherPopup(lat, lon, weather) {
+      const iconUrl = weather && weather.weather && weather.weather[0] && weather.weather[0].icon ?
+        `https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png` : '';
+      const name = (weather && (weather.name || weather.sys?.country)) ? (weather.name || '') : '';
+      const description = weather && weather.weather && weather.weather[0] ? weather.weather[0].description : 'N/D';
+      const temp = weather && weather.main ? `${weather.main.temp} °C` : 'N/D';
+      const humidity = weather && weather.main ? `${weather.main.humidity}%` : 'N/D';
+      const wind = weather && weather.wind ? `${weather.wind.speed} m/s` : 'N/D';
+      const html = `
+        <div style="min-width:180px">
+          <strong>Tempo${name ? ' — ' + name : ''}</strong><br/>
+          ${iconUrl ? `<img src="${iconUrl}" alt="icon" style="float:right;width:48px;height:48px;"/>` : ''}
+          <div><strong>${temp}</strong> — ${description}</div>
+          <div>Humidade: ${humidity}</div>
+          <div>Vento: ${wind}</div>
+          <div style="font-size:11px;color:#666;margin-top:6px;">Atualizado: ${new Date().toLocaleString()}</div>
+        </div>
+      `;
+      L.popup({ maxWidth: 300 })
+        .setLatLng([lat, lon])
+        .setContent(html)
+        .openOn(map);
+    }
+
+    // Click no mapa para ver clima
+    map.on('click', async function(e) {
+      const lat = e.latlng.lat;
+      const lon = e.latlng.lng;
+      const weather = await fetchWeather(lat, lon);
+      if (weather) showWeatherPopup(lat, lon, weather);
+      else L.popup().setLatLng([lat, lon]).setContent('<div>Tempo indisponível (verifique a API key)</div>').openOn(map);
+    });
+
+    // Controle que mostra tempo do centro do mapa e permite atualizar
+    const CenterWeatherControl = L.Control.extend({
+      onAdd: function(map) {
+        const div = L.DomUtil.create('div', 'legend');
+        div.style.minWidth = '200px';
+        div.innerHTML = `<div style="font-weight:700;margin-bottom:6px;">Tempo (centro do mapa)</div><div id="centerWeather">--</div><div style="margin-top:6px;text-align:right"><button id="refreshCenterWeather" style="padding:6px;border-radius:4px;border:none;background:#0c8f4f;color:white;cursor:pointer;">Atualizar</button></div>`;
+        L.DomEvent.disableClickPropagation(div);
+        return div;
+      }
+    });
+
+    const centerWeatherControl = new CenterWeatherControl({ position: 'topright' }).addTo(map);
+
+    async function updateCenterWeather() {
+      const el = document.getElementById('centerWeather');
+      if (!el) return;
+      const c = map.getCenter();
+      const w = await fetchWeather(c.lat, c.lng);
+      if (!w) {
+        el.innerHTML = '<small>API Meteo não configurada ou erro ao buscar.</small>';
+        document.getElementById('weatherStatus').innerText = 'API Meteo: não configurada ou erro';
+        return;
+      }
+      const icon = w.weather && w.weather[0] && w.weather[0].icon ? `<img src="https://openweathermap.org/img/wn/${w.weather[0].icon}.png" style="vertical-align:middle;"/>` : '';
+      el.innerHTML = `${icon} <strong>${w.main.temp} °C</strong> — ${w.weather[0].description} <div style="font-size:11px;color:#666">${w.name ?? ''} — Hum: ${w.main.humidity}%</div>`;
+      document.getElementById('weatherStatus').innerText = `API Meteo: configurada (atualizado ${new Date().toLocaleTimeString()})`;
+    }
+
+    // Atualiza quando o mapa para de se mover e a cada 60s
+    map.on('moveend', () => updateCenterWeather());
+    setInterval(() => updateCenterWeather(), 60000);
+
+    // Botão de refresh no controle
+    document.addEventListener('click', (ev) => {
+      if (ev.target && ev.target.id === 'refreshCenterWeather') updateCenterWeather();
+    });
+
+    // Função para configurar a API key via prompt (simples)
+    function configureWeatherKey() {
+      const key = prompt('Cole sua OpenWeatherMap API key (ex: abcdef12345):', OPENWEATHERMAP_API_KEY === 'COLOQUE_SUA_API_KEY_AQUI' ? '' : OPENWEATHERMAP_API_KEY);
+      if (key) {
+        OPENWEATHERMAP_API_KEY = key.trim();
+        document.getElementById('weatherStatus').innerText = 'API Meteo: configurada';
+        updateCenterWeather();
+      }
+    }
+
+    // Tentar conectar ao serviço Hidroweb (ANA) - requer CORS/allowed origin e possivelmente credenciais
+    async function tryLoadAna() {
+      stationsLayer.clearLayers();
+      const statusEl = document.getElementById('alertList');
+      const info = document.createElement('li');
+      info.innerHTML = 'Tentando conectar ao serviço Hidroweb (ANA)...';
+      statusEl.prepend(info);
+
+      // Possíveis endpoints públicos da ANA/Hidroweb. Observação: CORS pode bloquear requisições diretas do browser.
+      const candidates = [
+        'https://www.snirh.gov.br/hidrowebservices/api/estacoes?uf=RS',
+        'https://www.ana.gov.br/hidrowebservice/estacoes?uf=RS',
+        'https://www.snirh.gov.br/hidrowebservice/api/estacoes?uf=RS'
+      ];
+
+      for (const url of candidates) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error('Resposta não OK: ' + res.status);
+          const data = await res.json();
+          // A estrutura de 'data' depende do endpoint. Tentamos mapear de forma genérica.
+          const points = Array.isArray(data) ? data : (data.estacoes || data.features || []);
+          if (points.length === 0) throw new Error('Sem estações retornadas');
+
+          // Mapear alguns formatos comuns
+          points.forEach(p => {
+            const lat = p.latitude || (p.geometry && p.geometry.coordinates && p.geometry.coordinates[1]);
+            const lon = p.longitude || (p.geometry && p.geometry.coordinates && p.geometry.coordinates[0]);
+            const name = p.nome || p.name || p.estacao || p.id || 'Estação';
+            const level = p.nivel || p.last_level || p.valor || null;
+            if (lat && lon) {
+              const color = (level !== null && !isNaN(level)) ? (level >= 4 ? 'red' : (level >= 2 ? 'orange' : 'green')) : 'blue';
+              const marker = L.circleMarker([lat, lon], { radius:7, color }).addTo(stationsLayer);
+              marker.bindPopup(`<b>${name}</b><br/>Nível: ${level ?? 'N/D'}`);
+            }
+          });
+
+          if (stationsLayer.getLayers().length) map.fitBounds(stationsLayer.getBounds(), { padding: [40,40] });
+          info.innerHTML = 'Dados carregados com sucesso do endpoint: ' + url;
+          return;
+        } catch (err) {
+          console.warn('falha ao tentar', url, err.message);
+          info.innerHTML = `Falha ao conectar ${url}: ${err.message}`;
+          // tentar próximo
+        }
+      }
+
+      // Se chegou aqui, nenhum endpoint funcionou
+      const fallback = document.createElement('li');
+      fallback.innerHTML = 'Não foi possível obter dados em tempo real via navegador (CORS/API). Use "Carregar Exemplo" ou configure um proxy no servidor para acessar o API da ANA/Hidroweb.';
+      statusEl.prepend(fallback);
+    }
+
+    // Array para armazenar as perdas registradas
+    let perdasRegistradas = [];
+
+    // Form handling com armazenamento dos dados
+    document.getElementById('formPerda').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const nome = document.getElementById('nome').value;
+      const local = document.getElementById('local').value;
+      const perda = document.getElementById('perda').value;
+      const solicitacao = document.getElementById('solicitacao').value;
+      
+      // Armazena a perda no array
+      perdasRegistradas.push({
+        id: perdasRegistradas.length + 1,
+        nome,
+        local,
+        perda,
+        solicitacao,
+        data: new Date().toLocaleDateString()
+      });
+
+      document.getElementById('mensagem').innerText = `Perda registrada para ${nome} (${local}). Solicitação: ${solicitacao}.`;
+      this.reset();
+    });
+
+    function gerarRelatorio() {
+      // Se não houver perdas registradas
+      if (perdasRegistradas.length === 0) {
+        alert('Nenhuma perda registrada ainda.');
+        return;
+      }
+
+      // Cria o modal para exibir as perdas
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        max-width: 80%;
+        max-height: 80vh;
+        overflow-y: auto;
+        z-index: 1000;
+      `;
+
+      // HTML para o conteúdo do relatório
+      let conteudo = `
+        <h3>Relatório de Perdas Registradas</h3>
+        <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+          <thead>
+            <tr style="background: #f0f0f0;">
+              <th style="padding: 8px; border: 1px solid #ddd;">ID</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Data</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Produtor</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Local</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Descrição da Perda</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Solicitação</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      // Adiciona cada perda registrada à tabela
+      perdasRegistradas.forEach(p => {
+        conteudo += `
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">${p.id}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${p.data}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${p.nome}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${p.local}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${p.perda}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${p.solicitacao}</td>
+          </tr>
+        `;
+      });
+
+      conteudo += `
+          </tbody>
+        </table>
+        <div style="margin-top: 20px; text-align: right;">
+          <button onclick="this.parentElement.parentElement.remove()" class="btn">Fechar</button>
+        </div>
+      `;
+
+      modal.innerHTML = conteudo;
+      document.body.appendChild(modal);
+    }
+
+    function showSection(id) { document.querySelectorAll('section').forEach(sec => sec.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+
+    // Função para atualizar o mapa quando a seção estiver visível
+    function updateMapView() {
+      if (!map) return;
+      // Força o Leaflet a recalcular o tamanho do mapa
+      map.invalidateSize();
+      // Atualiza clima uma vez (se a key estiver configurada)
+      setTimeout(() => updateCenterWeather(), 800);
+    }
+
+    // Modifica showSection para atualizar o mapa quando a seção dashboard for mostrada
+    const originalShowSection = showSection;
+    showSection = function(id) {
+      document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+
+      // Atualiza estado visual dos botões de navegação
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      const btn = Array.from(document.querySelectorAll('nav button')).find(b => b.getAttribute('onclick') === `showSection('${id}')`);
+      if (btn) btn.classList.add('active');
+
+      if (id === 'dashboard') {
+        setTimeout(updateMapView, 100); // Pequeno delay para garantir que a seção esteja visível
+      }
+    };
+
+    // Inicialização quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+      // Se alguma seção já estiver ativa, marca o botão correspondente
+      const activeSection = document.querySelector('section.active');
+      if (activeSection) {
+        const id = activeSection.id;
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+        const btn = Array.from(document.querySelectorAll('nav button')).find(b => b.getAttribute('onclick') === `showSection('${id}')`);
+        if (btn) btn.classList.add('active');
+      }
+
+      if (document.getElementById('dashboard').classList.contains('active')) {
+        setTimeout(updateMapView, 100);
+      }
+    });
+  </script>
+</body>
+</html>
